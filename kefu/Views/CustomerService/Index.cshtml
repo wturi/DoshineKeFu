@@ -1,0 +1,293 @@
+﻿@{
+    ViewBag.Title = "客服系统";
+}
+@section styles{
+    <style type="text/css">
+        body {
+            font-family: 'Microsoft YaHei';
+        }
+
+        .jumbotron {
+            background: none;
+        }
+
+        .bk {
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: rgba(128, 128, 128,0.2);
+            -webkit-border-radius: 10px 10px 10px 10px;
+            -moz-border-radius: 10px 10px 10px 10px;
+        }
+
+        .tab-content > div {
+            background: rgba(128, 128, 128,0.2);
+        }
+
+        #foottext {
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+        }
+
+        .media .media-object {
+            width: 15vw;
+        }
+
+        .media .media-heading {
+            font-weight: 400;
+        }
+
+        .media .media-body > div {
+            max-width: 90%;
+            display: inline-block;
+            padding: 2vw;
+            background-color: white;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+        }
+
+        #alertmess > span {
+            background-color: white;
+            display: inline-block;
+            padding-left: 5vw;
+            padding-right: 5vw;
+            -webkit-border-radius: 15px;
+            -moz-border-radius: 15px;
+        }
+    </style>
+}
+
+
+
+<div class="row">
+    <div class="col-lg-2 col-md-2"></div>
+    <div class="col-lg-8 col-md-8 col-xs-12">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist" id="tab-tou">
+            @*<li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>*@
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content" id="tab-body">
+            @*<div role="tabpanel" class="tab-pane active" id="home"></div>*@
+        </div>
+    </div>
+    <div class="col-lg-2 col-md-2"></div>
+</div>
+
+
+
+@*<div class="col-xs-12" id="bodycontent00000001">
+        <div class="jumbotron" id="messages00000001">
+        </div>
+    </div>
+    <div class="input-group" id="foottext00000001">
+        <input type="text" class="form-control" id="sendText00000001" placeholder="输入信息">
+        <input type="hidden" id="msgstr00000001" />
+        <span class="input-group-btn">
+            <button class="btn btn-default" onclick="send()" id="00000001" type="button">提交</button>
+        </span>
+    </div>*@
+
+
+@section scripts{
+    <script src="~/Scripts/Models.js"></script>
+    <script type="text/javascript">
+        var NewNickIp = new NickIp('00000001', '客服', '', true, false, '100001', '0000000001', '', '');
+        var socket;
+        var serverIP = '192.168.1.147';//服务器IP
+        var serverPort = '9000';//服务器端口
+
+
+        window.onload = function () {
+            connect();
+        }
+
+        function connect() {
+            var host = "ws://" + serverIP + ":" + serverPort + "/"
+            socket = new WebSocket(host);
+
+            try {
+                socket.onopen = function (msg) {
+                    //$("btnConnect").disabled = true;
+                    //alert("连接成功！");
+                    socket.send(JSON.stringify(NewNickIp) + ' ');
+
+                    //var str = '<div id="alertmess" class="text-center">'
+                    //         + '<span>连接成功！</span>'
+                    //         + '</div>';
+                    //document.getElementById("messages").innerHTML = document.getElementById("messages").innerHTML + str;
+                };
+
+                socket.onmessage = function (msg) {
+                    if (typeof msg.data == "string") {
+                        displayContent(msg.data);
+                    }
+                    else {
+                        var str = '<div id="alertmess" class="text-center">'
+                             + '<span>非文本信息！</span>'
+                             + '</div>';
+                        //document.getElementById("messages").innerHTML = document.getElementById("messages").innerHTML + str;
+                    }
+                };
+
+                socket.onclose = function (msg) { alert("socket closed!") };
+            }
+            catch (ex) {
+                var str = '<div id="alertmess" class="text-center">'
+                             + '<span>网络错误，连接失败！</span>'
+                             + '</div>';
+                //document.getElementById("messages").innerHTML = document.getElementById("messages").innerHTML + str;
+                log(ex);
+            }
+        }
+
+
+        function send(e) {
+            var e = window.event || e;
+            var o = e.srcElement || e.target;
+            var msg = document.getElementById('sendText' + o.id).value + ' ';
+            var msgsss = JSON.parse(document.getElementById('msgstr' + o.id).value);
+
+            if (msg == ' ' || msg == null) {
+                return;
+            } else {
+                msgsss.Msg = msg;
+                msgsss.IsFirst = false;
+                msgsss.IsUser = false;
+                socket.send(JSON.stringify(msgsss) + ' ');
+                var mes = document.getElementById("messages" + o.id);
+                var last = mes.lastChild;
+                if (last.className === 'media mediaright') {
+                    var textcontent = last.firstChild.getElementsByTagName('div')[0].innerHTML;
+                    textcontent = textcontent + '<br>' + msg;
+                    last.firstChild.getElementsByTagName('div')[0].innerHTML = textcontent;
+                } else {
+                    var str = '<div class="media mediaright">'
+                           + '<div class="media-body">'
+                               + '<h5 class="media-heading text-right">我</h5>'
+                               + '<div class="pull-right mediacontent">' + msg + '</div>'
+                           + '</div>'
+                           + '<div class="media-right">'
+                               + '<a href="#">'
+                                   + '<img class="media-object img-circle" src="../../Imgs/touxiang.jpg" alt="...">'
+                               + '</a>'
+                           + '</div>'
+                       + '</div>';
+                    var html = document.getElementById("messages" + o.id).innerHTML + str;
+                    document.getElementById("messages" + o.id).innerHTML = html;
+                }
+                var div = document.getElementById('messages' + o.id);
+                window.scrollTo(0, div.scrollHeight);
+                document.getElementById('sendText' + o.id).value = '';
+            }
+
+        }
+
+        window.onbeforeunload = function () {
+            try {
+                socket.close();
+                socket = null;
+            }
+            catch (ex) {
+            }
+        };
+
+        function $(id) { return document.getElementById(id); }
+
+        Date.prototype.Format = function (fmt) { //author: meizz
+            var o = {
+                "M+": this.getMonth() + 1, //月份
+                "d+": this.getDate(), //日
+                "h+": this.getHours(), //小时
+                "m+": this.getMinutes(), //分
+                "s+": this.getSeconds(), //秒
+                "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+                "S": this.getMilliseconds() //毫秒
+            };
+            if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            for (var k in o)
+                if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            return fmt;
+        }
+
+        function displayContent(msg) {
+            var msgsss = JSON.parse(msg);
+
+
+            if (document.getElementById("messages" + msgsss.NickID) == null) {
+                var tabtitle = '';
+                var tabbody = '';
+
+                if (document.getElementById("tab-tou").innerHTML.length > 100) {
+                    tabtitle = '<li role="presentation" ><a href="#' + msgsss.NickID + '" aria-controls="' + msgsss.NickID + '" role="tab" data-toggle="tab">' + msgsss.NickName + '</a></li>';
+                } else {
+                    tabtitle = '<li role="presentation" class="active"><a href="#' + msgsss.NickID + '" aria-controls="' + msgsss.NickID + '" role="tab" data-toggle="tab">' + msgsss.NickName + '</a></li>';
+                }
+
+
+                var tabconteng = '<div class="col-xs-12" id="bodycontent' + msgsss.NickID + '">'
+                                    + '<div class="jumbotron" id="messages' + msgsss.NickID + '">'
+                                    + '</div>'
+                                    + '</div>'
+                                    + '<div class="input-group" id="foottext' + msgsss.NickID + '">'
+                                    + '<input type="text" class="form-control" id="sendText' + msgsss.NickID + '" placeholder="输入信息">'
+                                    + '<input type="hidden" id="msgstr' + msgsss.NickID + '" />'
+                                    + '<span class="input-group-btn">'
+                                    + '<button class="btn btn-default" onclick="send()" id="' + msgsss.NickID + '" type="button">提交</button>'
+                                    + '</span>'
+                                    + '</div>';
+
+                if (document.getElementById("tab-tou").innerHTML.length > 100) {
+                    tabbody = '<div role="tabpanel" class="tab-pane" id="' + msgsss.NickID + '">' + tabconteng + '</div>';
+                } else {
+                    tabbody = '<div role="tabpanel" class="tab-pane active" id="' + msgsss.NickID + '">' + tabconteng + '</div>';
+                }
+
+
+
+                document.getElementById("tab-tou").innerHTML = document.getElementById("tab-tou").innerHTML + tabtitle;
+                document.getElementById("tab-body").innerHTML = document.getElementById("tab-body").innerHTML + tabbody;
+            }
+
+            var mes = document.getElementById("messages" + msgsss.NickID);
+            var last = mes.lastChild;
+
+            document.getElementById('msgstr' + msgsss.NickID).value = msg;
+
+            if (last != null && last.className === 'media medialeft') {
+                var textcontent = last.lastChild.getElementsByTagName('div')[0].innerHTML;
+                textcontent = textcontent + '<br>' + msgsss.Msg;
+                last.lastChild.getElementsByTagName('div')[0].innerHTML = textcontent;
+            } else {
+                var str = '<div class="media medialeft">'
+                     + '<div class="media-left">'
+                         + '<a href="#">'
+                         + '<img class="media-object img-circle" src="../../Imgs/touxiang.jpg" alt="...">'
+                         + '</a>'
+                     + '</div>'
+                     + '<div class="media-body">'
+                         + '<h5 class="media-heading">' + msgsss.NickName + '</h5>'
+                         + '<div class="mediacontent">' + msgsss.Msg + '</div>'
+                     + '</div>'
+                     + '</div>';
+                var html = document.getElementById("messages" + msgsss.NickID).innerHTML + str;
+                document.getElementById("messages" + msgsss.NickID).innerHTML = html;
+            }
+            var div = document.getElementById('messages' + msgsss.NickID);
+            window.scrollTo(0, div.scrollHeight);
+
+
+
+
+        }
+
+        function onkey(event) { if (event.keyCode == 13) { send(); } }
+
+    </script>
+}
+

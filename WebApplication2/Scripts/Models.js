@@ -9,4 +9,5 @@ function NickIp(NickID, NickName, Msg, IsFirst, IsUser, PairingServiceID, Pairin
     this.PairingUserID = PairingUserID;                         //配对用户昵称
     this.PairingServiceIP = PairingServiceIP;                   //配对客服IP
     this.PairingUserIP = PairingUserIP;                         //配对用户IP
+
 }

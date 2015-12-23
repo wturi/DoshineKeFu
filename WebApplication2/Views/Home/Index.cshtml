@@ -69,12 +69,13 @@
 </div>
 
 
+
 @section scripts{
     <script src="~/Scripts/Models.js"></script>
     <script type="text/javascript">
-        var NewNickIp = new NickIp('00000001', '李四', '', true, true, '100001', '0000000001', '', '');
+        var NewNickIp = new NickIp('00000002', 'zhangsan', '', true, true, '100001', '0000000001', '', '');
         var socket;
-        var serverIP = '192.168.1.147';//服务器IP
+        var serverIP = '192.168.1.151';//服务器IP
         var serverPort = '9000';//服务器端口
 
 
@@ -121,7 +122,6 @@
                 log(ex);
             }
         }
-
 
         function send() {
             var msg = document.getElementById('sendText').value + ' ';
@@ -216,6 +216,7 @@
             window.scrollTo(0, div.scrollHeight);
 
         }
+
         function onkey(event) { if (event.keyCode == 13) { send(); } }
     </script>
 }

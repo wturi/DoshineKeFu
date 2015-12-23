@@ -34,7 +34,7 @@
         }
 
         .media .media-object {
-            width: 15vw;
+            width: 40px;
         }
 
         .media .media-heading {
@@ -58,6 +58,11 @@
             -webkit-border-radius: 15px;
             -moz-border-radius: 15px;
         }
+
+        #tab-body {
+            height: 600px;
+            background-color: red;
+        }
     </style>
 }
 
@@ -65,12 +70,11 @@
 
 <div class="row">
     <div class="col-lg-2 col-md-2"></div>
-    <div class="col-lg-8 col-md-8 col-xs-12">
+    <div class="col-lg-8 col-md-8 col-xs-12" id="bodyparent">
         <!-- Nav tabs -->
         <ul class="nav nav-tabs" role="tablist" id="tab-tou">
             @*<li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>*@
         </ul>
-
         <!-- Tab panes -->
         <div class="tab-content" id="tab-body">
             @*<div role="tabpanel" class="tab-pane active" id="home"></div>*@
@@ -99,7 +103,7 @@
     <script type="text/javascript">
         var NewNickIp = new NickIp('00000001', '客服', '', true, false, '100001', '0000000001', '', '');
         var socket;
-        var serverIP = '192.168.1.147';//服务器IP
+        var serverIP = '192.168.1.152';//服务器IP
         var serverPort = '9000';//服务器端口
 
 
@@ -267,7 +271,7 @@
                 var str = '<div class="media medialeft">'
                      + '<div class="media-left">'
                          + '<a href="#">'
-                         + '<img class="media-object img-circle" src="../../Imgs/touxiang.jpg" alt="...">'
+                         + '<img class="media-object img-circle" src="' + msgsss.Headimgurl + '" alt="...">'
                          + '</a>'
                      + '</div>'
                      + '<div class="media-body">'
